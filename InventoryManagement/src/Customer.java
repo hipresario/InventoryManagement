@@ -1,5 +1,6 @@
 /**
  * Customer Information
+ * Add/Remove Customer from DVD waiting list
  */
 import java.io.Serializable;
 
@@ -25,7 +26,9 @@ public class Customer implements Serializable {
 		this.address = address;
 	}
 	public String toString(){
-		return "Customer Name: " + this.first + " " + this.last + " Phone: " + this.phone + " Address:" + this.address ;
+		return "Customer: " + this.first + " " + this.last + "\n"
+				+ "Phone: " + this.phone + "\n"
+				+"Address:" + this.address ;
 	}
 	public String getAddress() {
 		return address;
@@ -52,5 +55,4 @@ public class Customer implements Serializable {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	
 }

@@ -1,5 +1,5 @@
 /**
- * List Interface for Reference Based Linked List implementation
+ * List Interface for reference based LinkedList implementation
  * @author user
  *
  */

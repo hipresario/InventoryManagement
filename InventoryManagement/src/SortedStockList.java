@@ -1,7 +1,6 @@
 import java.io.Serializable;
 
-
-public class SortedList implements Serializable{
+public class SortedStockList implements ListInterface, Serializable{
 	/**
 	 * 
 	 */
@@ -9,7 +8,7 @@ public class SortedList implements Serializable{
 	private Node head;
 	private int numItems;
 	
-	public SortedList (){
+	public SortedStockList (){
 		this.head = null;
 		this.numItems = 0;
 	}
@@ -35,52 +34,53 @@ public class SortedList implements Serializable{
 	}
 
 	public int size() {
-		// TODO Auto-generated method stub
 		return numItems;
 	}
 
-	public void add(Object item)
+	public void addStock(Object item)
 			throws ListIndexOutOfBoundsException {
-		//add need to find stock title position
-		int pos = findStockItem ((StockItem)item);
-		//Node curr = find (pos);
+		//add need to find stock title position by alphabetic order
+		int pos = this.findStockByAphabeticOrder((StockItem)item);
 		if (pos == 1){
 				Node newNode = new Node(item, head);
 				head = newNode;
 				numItems ++;
 		} else if ( pos > 1) {
-				Node prev = find(pos-1);
+				Node prev = findStockByIndex(pos-1);
 				Node newNode = new Node (item, prev.getNext());
 				prev.setNext(newNode);
 				numItems ++;
 		} else {
-			throw new ListIndexOutOfBoundsException("Add list out of bonds index.");
+			throw new ListIndexOutOfBoundsException("Add stock list out of bonds index.");
 		}
 		
 	}
-	private Node find (int index){
+	//find stock by index number
+	private Node findStockByIndex (int index){
 		Node curr = head;
 		for (int skip = 1; skip < index; skip++){
 			curr = curr.getNext();
 		}
 		return curr;
 	}
-	//find by Alphabetic order title
-	private int findStockItem (StockItem s){
+	//find position for stock to be added by title in alphabetic order (a-z)
+	private int findStockByAphabeticOrder (StockItem s){
 		Node curr = head;
 		int index = 1;
 		if (numItems == 0){
 			return index;
 		}
-		
 		for (int skip = 1; skip <= this.numItems; skip++){
+			//if current stock title > s.title stop
 			if (((StockItem)curr.getItem()).compareTo(s) >= 0){
 				index = skip;
 				break;
 			} else {
+				//get next stock to compare
 				if (curr.getNext()!= null){
 					curr = curr.getNext();
 				} else {
+					//last stock
 					index = skip+1;	
 				}
 			}
@@ -88,14 +88,13 @@ public class SortedList implements Serializable{
 		return index;
 	}
 	
-	public void remove(Object item) throws ListIndexOutOfBoundsException {
-		int pos = findStockItem ((StockItem)item);
-		
+	public void removeStock(Object item) throws ListIndexOutOfBoundsException {
+		int pos = findStockByAphabeticOrder ((StockItem)item);
 		if (pos == 1){
 				head = head.getNext();
 				numItems --;
 		} else if (pos > 1){
-				Node prev = find (pos);
+				Node prev = findStockByIndex (pos);
 				prev.setNext(prev.getNext().getNext());
 				numItems --;
 		} else {
@@ -103,10 +102,9 @@ public class SortedList implements Serializable{
 		}
 	}
 
-	public Object get(int index) throws ListIndexOutOfBoundsException {
+	public Object getStock(int index) throws ListIndexOutOfBoundsException {
 		if (index >=1 && index <= numItems ) {
-			
-			Node curr = find (index);
+			Node curr = findStockByIndex (index);
 			return curr.getItem();
 		} else {
 			throw new ListIndexOutOfBoundsException("List Index out of bounds on get");
@@ -114,10 +112,25 @@ public class SortedList implements Serializable{
 	}
 
 	public void removeAll() {
-		// TODO Auto-generated method stub
 		this.head = null;
 		this.numItems = 0;
-				
+	}
+
+	@Override
+	public void add(int index, Object item)
+			throws ListIndexOutOfBoundsException {
+		
+	}
+
+	@Override
+	public void remove(int index) throws ListIndexOutOfBoundsException {
+		
+	}
+
+	@Override
+	public Object get(int index) throws ListIndexOutOfBoundsException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

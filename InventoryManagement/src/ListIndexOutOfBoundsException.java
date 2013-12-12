@@ -1,4 +1,8 @@
-
+/**
+ * LinkedList out of index Exception
+ * @author user
+ *
+ */
 public class ListIndexOutOfBoundsException extends Exception {
 	/**
 	 * 

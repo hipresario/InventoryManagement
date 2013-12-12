@@ -9,16 +9,15 @@ public class DVDInventory implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 10L;
-	static SortedList inventory = new SortedList();
+	static SortedStockList inventory = new SortedStockList();
 	
 	public static void main(String [] arg){
 		
 		String userinput= "";
 		
-		System.out.println("Welcome to DVD Inventory Management System!");
-		System.out.println("Enter H for Available Commands, Q for Quit.");
-		nextCommandLine();
-		
+		displayInformation("Welcome to DVD Inventory Management System!");
+		displayInformation("Enter H for Available Commands, Q to Quit...");
+		displayInformation("==>");		
 		do {
 			Scanner sc = new Scanner(System.in);
 			userinput = sc.nextLine();
@@ -26,50 +25,6 @@ public class DVDInventory implements Serializable {
 			
 		} while (!userinput.equalsIgnoreCase("q"));
 		
-		
-//		ListReferenceBased waitingList = new ListReferenceBased();
-//		Customer c = new Customer ("Jianmin", "Yu", "84080013");
-//		StockItem s = new StockItem("Dragon Me", 1,2);
-//		s.setWaitingList(waitingList);
-//		
-//		
-//		ListReferenceBased waitingList2 = new ListReferenceBased();
-//		Customer c2 = new Customer ("Liting", "Liang", "90929112");
-//		StockItem s2 = new StockItem("G Man 2", 3,4);
-//		s2.setWaitingList(waitingList2);
-//		
-//		StockItem s3 = new StockItem("A City", 2,3);
-//		s3.setWaitingList(waitingList2);
-//		
-//		StockItem s4 = new StockItem("C City", 2,3);
-//		s4.setWaitingList(waitingList2);
-//		
-		
-	//	try {
-//			s.addToWaitingList(c);
-//			s2.addToWaitingList(c);
-//			s2.addToWaitingList(c2);
-//			
-//			inventory.add(s);
-//			inventory.add(s2);
-//			inventory.add(s3);
-//			inventory.add(s4);
-//		} catch (ListIndexOutOfBoundsException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-	//	}
-		
-//		try {
-//			int size = inventory.size();
-//			for (int i=1;i<=size;i++){
-//				System.out.println( i+":\n" + inventory.get(i));
-//			}
-//				
-//		} catch (ListIndexOutOfBoundsException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
 	}
 	private static void doTask(String... input){
 		String choice = "";
@@ -84,180 +39,194 @@ public class DVDInventory implements Serializable {
 			 displayAll();
 			break;
 		case "i":
-			System.out.println("Please enter DVD title: ");
-			Scanner sc0 = new Scanner(System.in);
-			String title = sc0.nextLine();
-			 displayByTitle(title);
+			 displayByTitle();
 			break;
 		case "a":
-			System.out.println("Please enter DVD title: ");
-			Scanner sc1 = new Scanner(System.in);
-			String titleAdd = sc1.nextLine();
-			addByTitle(titleAdd);	
+			addByTitle();	
 			break;
 		case "m":
-			System.out.println("Please enter DVD title: ");
-			Scanner sc2 = new Scanner(System.in);
-			String titleM = sc2.nextLine();
-			modifyByTitle(titleM);	
+			modifyByTitle();	
 			break;
 		case "d":
-			
+			deliveryDVD();
 			break;
 		case "o":
-			writeDVDOrder();
+			writePurchaseOrder();
 			break;
-		case "r":
-			writeDVDReturn();
-			break;
+		//case "r":
+			//writeDVDReturn();
+			//break;
 		case "s":
 			sellByTitle();
 			break;
 		case "q":
 			    //save data
 				saveInventory();
-				System.out.println("Bye, system is shutting down.");
+				displayInformation("Bye, system is shutting down.");
 			break;
 		default:
-			System.out.println("Please enter the correct command.");
-			nextCommandLine();
+			displayInformation("Please enter the correct command.");
+			displayInformation("==>");
 		}
-		//System.out.println(input);
 	}
+	//help menu
 	public static void printHelpMenu(){
-		System.out.println("===============Help Menu==============");
-		System.out.println("L => Display All DVD Titles");
-		System.out.println("I Title => Display the Information for a specific title");
-		System.out.println("A Title => Add a new title to the inventory");
-
+		displayInformation("===============Help Menu==============");
+		displayInformation("L => Display all DVDs by title");
+		displayInformation("I => Display information for a specific title");
+		displayInformation("A => Add a new DVD title to the inventory");
+		displayInformation("D => Deliver DVD to people in waiting list");
+		displayInformation("M => Modify want value for a specific title");
+		displayInformation("O => Print out purchase order");
+		//displayInformation("R => Make a return order after purchasing done");
+		displayInformation("S => Sell a DVD");
+		displayInformation("Q => Save and exit the system");
+		
 	}	
-	
+	//display all DVD in ascending order
 	public static void displayAll(){
-		System.out.println("Display All DVD Information");
 		try {
 			int size = inventory.size();
 			if (size == 0){
-				System.out.println( "DVD Inventory is empty...\n");
+				displayInformation( "DVD Inventory is empty.");
 				return;
 			}
 			for (int i=1;i<=size;i++){
-				StockItem s = (StockItem)inventory.get(i);
-				System.out.println( i+": " +s.getTitle() + "\n");
+				StockItem s = (StockItem)inventory.getStock(i);
+				displayInformation( i+": " +s.getTitle() + "\n");
 			}
 				
 		} catch (ListIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("Display All Inventory Information Error.");
+			displayInformation("Display inventory information error.");
 		} finally {
-			nextCommandLine();
+			displayInformation("==>");
 		}
 		
 		
 	}
-	
-	public static void displayByTitle(String title){
+	//display DVD information by title in details
+	public static void displayByTitle(){
+		
+		System.out.println("Please enter DVD title: ");
+		Scanner sc = new Scanner(System.in);
+		String title = sc.nextLine();
 		
 		StockItem s = null;
 		try {
 			s = findStockItemByTitle(title);
 		} catch (ListIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			displayInformation("Display "+ title+" error.");
 		}
 		if (s == null){
-			System.out.println("No result found. Inventory is empty.");
+			displayInformation("No result found.");
 		} else {
-			System.out.println(s);
+			displayInformation(s.toString());
 		}
-		nextCommandLine();
+		displayInformation("==>");
 	}
-	
-	
+	//find stock item by title in list
 	private static StockItem findStockItemByTitle(String title) throws ListIndexOutOfBoundsException{
 		int size = inventory.size();
 		if (size ==0){
 			return null;
 		}
 		for (int skip = 1; skip <= size; skip++){
-			if (((StockItem) inventory.get(skip)).getTitle().equalsIgnoreCase(title)){
-				return (StockItem) inventory.get(skip);
+			if (((StockItem) inventory.getStock(skip)).getTitle().equalsIgnoreCase(title)){
+				return (StockItem) inventory.getStock(skip);
 			} else {
 				}
 			}
 		return null;
 	}
-	
-	public static void addByTitle(String... t){
-		String title = "";
-		if (t.length >= 1){
-			title = t[0];
-		}
-		
+	//add by title
+	public static void addByTitle(){
+		displayInformation("Please enter DVD title: ");
+		Scanner sc = new Scanner(System.in);
+		String title = sc.nextLine();
 		StockItem s = new StockItem(title);
-		
 		try {
-			inventory.add(s);
+			inventory.addStock(s);
+			//update have value
 			s.setHave(s.getHave()+1);
-			System.out.println(title + " is successfully added to inventory.");
+			displayInformation(title + " is successfully added to inventory.");
 		} catch (ListIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("Adding " + title + " to inventory has error.");
+			displayInformation("Adding " + title + " to inventory has error.");
 		}
 		finally {
-			nextCommandLine();
-
+			displayInformation("==>");
 		}
-		
 	}
-	
-	public static void modifyByTitle(String... t){
-		String title = "";
-		if (t.length >=1){
-			title = t[0];
-		}
-		System.out.println("Want number for "+ title +": ");
+	//modify want number for DVD
+	public static void modifyByTitle(){
+		
+		displayInformation("Please enter DVD title: ");
 		Scanner sc = new Scanner(System.in);
-		int num = sc.nextInt();
+		String title = sc.nextLine();
+		displayInformation("Want number for "+ title +": ");
+		Scanner sc2 = new Scanner(System.in);
+		int num = sc2.nextInt();
 		StockItem s = null;
 		try {
 			s = findStockItemByTitle(title);
 		} catch (ListIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			displayError("Modification error.");
+			displayInformation("Modification error.");
 		}
 		if (s == null){
-			System.out.println("No result found.");
+			displayInformation("No result found.");
 		} else {
 			s.setWant(num);
-			System.out.println("Modification successfully done.");
+			for (int a=1;a<=num;a++){
+				displayInformation("Setting up waiting list for " + title);
+				displayInformation("Enter customer last name:");
+				String last = sc.nextLine();
+				displayInformation("Enter customer first name: ");
+				String first = sc.nextLine();
+				displayInformation("Enter customer phone number:");
+				String phone = sc.nextLine();
+				displayInformation("Enter customer address: ");
+				String address = sc.nextLine();
+				Customer c = new Customer(first, last, phone, address);
+				try {
+					s.addToWaitingList(c);
+				} catch (ListIndexOutOfBoundsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			displayInformation("Modification successfully done.");
 		}
-		nextCommandLine();
+		displayInformation("==>");
 		
 	}
 	
 	//compare want and have values to create a list of DVDs need to order
-	public static void writeDVDOrder ()  {
+	public static void writePurchaseOrder ()  {
 		int size = inventory.size();
 		boolean noOrder = true;
 		if (size ==0){
-			System.out.println("Inventory is empty.");
-			nextCommandLine();
+			displayInformation("Inventory is empty.");
+			displayInformation("==>");
 			return;
 		}
 		for (int skip = 1; skip <= size; skip++){
 			StockItem s = null;
 			try {
-				s = ((StockItem)inventory.get(skip));
+				s = ((StockItem)inventory.getStock(skip));
 				if (s == null ){
-					displayError("Inventory write order error.");
+					displayInformation("Inventory purchase order error.");
 					return;
 				}
 				int order = s.getOrderNumber();
 				if (order > 0){
-					System.out.println("Order for " + s.getTitle() + " is: "+ order + "\n");
+					displayInformation("Order number for " + s.getTitle() + " : "+ order);
 					s.setHave(s.getWant());
 					noOrder = false;
 				} else {
@@ -267,16 +236,17 @@ public class DVDInventory implements Serializable {
 			} catch (ListIndexOutOfBoundsException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				displayError("Inventory write order error.");
+				displayInformation("Inventory write order error.");
 			}
 		}
 		if (noOrder){
-			displayError("No order needed.");
+			displayInformation("No order needed.");
 		}
+		displayInformation("==>");
 	}
 	
 	public static void sellByTitle(){
-		System.out.println("Sell for :");
+		displayInformation("Sell for DVD title:");
 		String title = "";
 		Scanner sc = new Scanner(System.in);
 		title  = sc.nextLine();
@@ -286,81 +256,129 @@ public class DVDInventory implements Serializable {
 		} catch (ListIndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			displayError("Sell DVD error.");
+			displayInformation("Sell DVD error.");
 		}
 		if (s == null){
-			System.out.println("No result found.");
+			displayInformation("No result found.");
 		} else {
 			int have = s.getHave();
 			//put on waiting list
 			if (have == 0 ){
-				System.out.println("DVD is out of stock.");
-				System.out.println("Setting up waiting list for " + title);
-				
-				System.out.println("Enter customer last name:");
+				displayInformation("DVD is out of stock.");
+				displayInformation("Setting up waiting list for " + title);
+				displayInformation("Enter customer last name:");
 				String last = sc.nextLine();
-				System.out.println("Enter customer first name: ");
+				displayInformation("Enter customer first name: ");
 				String first = sc.nextLine();
-				
-				System.out.println("Enter customer phone number:");
+				displayInformation("Enter customer phone number:");
 				String phone = sc.nextLine();
-				System.out.println("Enter customer address: ");
+				displayInformation("Enter customer address: ");
 				String address = sc.nextLine();
-				
 				Customer c = new Customer(first, last, phone, address);
-				
 				try {
 					s.addToWaitingList(c);
+					//update want number
+					s.setWant(s.getWant()+1);
 				} catch (ListIndexOutOfBoundsException e) {
 					// TODO Auto-generated catch block
-					e.printStackTrace();
+					//e.printStackTrace();
+					displayInformation("Add to waiting list error.");
 				}finally {
-					displayError("Successfully updated waiting list for " + title);
+					displayInformation("Successfully updated waiting list for " + title);
 				}
 			} else {
 				s.setHave(have -1 );
-				displayError("Sold successfully.");
+				displayInformation("Sold successfully.");
 			}
 		 
 		}
-		nextCommandLine();
+		displayInformation("==>");
 	}
-	
-	public static void deliveryDVD(){
-		
-	}
-	//return order to reduce the have value to a want value
-	//if have - want >= 0 then have = have -want, want = 0;
-	//if have - want < 0; then have = 0; want = want - have
 	public static void writeDVDReturn(){
 		
+	}
+	//deliver DVD to customer in the 1st of waiting list 1 by 1, only for those available ones
+	//if have - want >= 0 then have = have - want, want = 0;
+	//if have - want < 0; then have = 0; want = want - have
+	public static void deliveryDVD(){
 		int size = inventory.size();
 		if (size ==0){
-			System.out.println("Inventory is empty.");
-			nextCommandLine();
+			displayInformation("Inventory is empty.");
+			displayInformation("==>");
 			return;
 		}
 		for (int skip = 1; skip <= size; skip++){
 			StockItem s = null;
 			try {
-				s = ((StockItem)inventory.get(skip));
-				int order = s.getOrderNumber();
-				if (order >= 0){// have = 0; want = want -have
-					s.setWant(s.getWant() - s.getHave());
-					s.setHave(0);
-				} else {
-					s.setHave(s.getHave() - s.getWant());
-					s.setWant(0);
+				s = ((StockItem)inventory.getStock(skip));
+				int have = s.getHave();
+				int want = s.getWant();
+				int waitingSize =  s.getWaitingList().size();
+				if (want == 0){
+					// no delivery
+				}else { 
+					//want > 0
+					if (waitingSize == 0 ){
+						//no people in list recode
+					}else { 
+						//have >= want
+						if (have >= want){
+							if (want >= waitingSize){ //waiting is less than want
+								for (int i=1;i<=waitingSize;i++){
+									//display first
+									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									s.removeFromWaitingList();
+									
+								}
+								want = want - waitingSize;
+								s.setWant(want);
+								s.setHave(have-waitingSize);	
+							} else {
+								//waiting is more than want
+								for (int i=1;i<=want;i++){
+									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									s.removeFromWaitingList();
+								}
+								want = waitingSize - want;
+								s.setWant(want);
+								s.setHave(have-waitingSize);
+							}
+						}else {
+							//have < want
+							if (have >= waitingSize){ //waiting is less than have
+								for (int i=1;i<=waitingSize;i++){
+									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									s.removeFromWaitingList();
+								}
+								want = want - waitingSize;
+								s.setWant(want);
+								s.setHave(have-waitingSize);	
+							} else {
+								//waiting is more than have
+								for (int i=1;i<=have;i++){
+									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									s.removeFromWaitingList();
+
+								}
+								have = 0;
+								s.setHave(0);
+								s.setWant(want-waitingSize);
+							}
+						}
+					}
 				}
-				
 			} catch (ListIndexOutOfBoundsException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				displayError("Return error.");
+				displayInformation("Delivery error.");
+			}finally{
+				displayInformation("Delivery is done.");		
 			}
 		}
-		System.out.println("Return is done.");
+		
+		displayInformation("==>");
 	}
+	//Save inventory 
 	public static void saveInventory(){
 		try{
 			FileOutputStream fos = new FileOutputStream ("inventory.dat");
@@ -369,15 +387,11 @@ public class DVDInventory implements Serializable {
 			fos.close();
 		} 
 		catch (Exception e) {
-			System.out.println("Store data error.\n"+e.getMessage());
+			displayInformation("Store data error.\n"+e.getMessage());
 		}
 	}
-	public static void nextCommandLine(){
-		System.out.println("==>");
-
-	}
-		
-	public static void displayError(String msg){
+	//display information
+	public static void displayInformation(String msg){
 		System.out.println(msg);
 	}
 }

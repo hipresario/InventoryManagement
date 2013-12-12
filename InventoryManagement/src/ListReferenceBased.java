@@ -1,3 +1,6 @@
+/**
+ * Linked List reference based implementation 
+ */
 import java.io.Serializable;
 
 public class ListReferenceBased implements ListInterface,Serializable {
@@ -23,17 +26,23 @@ public class ListReferenceBased implements ListInterface,Serializable {
 		return numItems;
 	}
 
-	private Node find (int index){
+	private Node find (int index) throws ListIndexOutOfBoundsException{
 		Node curr = head;
-		for (int skip = 1; skip < index; skip++){
-			curr = curr.getNext();
-		}
+		if (index >= 1 && index <= numItems){
+			for (int skip = 1; skip < index; skip++){
+				curr = curr.getNext();
+			}	
+		} else {
+			throw new ListIndexOutOfBoundsException("Find list out of bonds index: "+ index+".");
+		} 
+		
 		return curr;
 	}
 	
 	@Override
 	public void add(int index, Object item)
 			throws ListIndexOutOfBoundsException {
+		
 		if (index == 1){
 			Node newNode = new Node(item, head);
 			head = newNode; //assign head to the new node
@@ -45,7 +54,7 @@ public class ListReferenceBased implements ListInterface,Serializable {
 			prev.setNext(newNode);
 			numItems ++;
 		} else {
-			throw new ListIndexOutOfBoundsException("Add list out of bonds index.");
+			throw new ListIndexOutOfBoundsException("Add to list out of bonds index: "+index +".");
 		}
 		
 	}
@@ -59,7 +68,7 @@ public class ListReferenceBased implements ListInterface,Serializable {
 			prev.setNext(prev.getNext().getNext());
 			numItems --;
 		} else {
-			throw new ListIndexOutOfBoundsException("Remove list out of bonds index.");
+			throw new ListIndexOutOfBoundsException("Remove from list out of bonds index: "+ index+".");
 		}
 		
 	}
@@ -69,7 +78,7 @@ public class ListReferenceBased implements ListInterface,Serializable {
 			Node curr = find (index);
 			return curr.getItem();
 		} else {
-			throw new ListIndexOutOfBoundsException("List Index out of bounds on get");
+			throw new ListIndexOutOfBoundsException("Get list out of bounds index: "+index+".");
 		}
 	}
 	@Override
