@@ -1,21 +1,30 @@
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Scanner;
 
-
-public class DVDInventory implements Serializable {
-	/**
-	 * 
-	 */
+public class InventoryManagement implements Serializable {
 	private static final long serialVersionUID = 10L;
 	static SortedStockList inventory = new SortedStockList();
 	
 	public static void main(String [] arg){
+		displayInformation("Welcome to DVD Inventory Management System!");
+		//loading for inventory.dat file first
+		try{
+			FileInputStream fis = new FileInputStream("inventory.dat");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			Object o = ois.readObject();
+			inventory = (SortedStockList)o;
+			
+		}catch (Exception e){
+			displayInformation("Reading inventory file error.");
+		}finally {
+		}
+		
 		
 		String userinput= "";
-		
-		displayInformation("Welcome to DVD Inventory Management System!");
 		displayInformation("Enter H for Available Commands, Q to Quit...");
 		displayInformation("==>");		
 		do {
@@ -81,7 +90,7 @@ public class DVDInventory implements Serializable {
 		//displayInformation("R => Make a return order after purchasing done");
 		displayInformation("S => Sell a DVD");
 		displayInformation("Q => Save and exit the system");
-		
+		displayInformation("==>");
 	}	
 	//display all DVD in ascending order
 	public static void displayAll(){
@@ -328,7 +337,6 @@ public class DVDInventory implements Serializable {
 									//display first
 									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
 									s.removeFromWaitingList();
-									
 								}
 								want = want - waitingSize;
 								s.setWant(want);
@@ -362,7 +370,7 @@ public class DVDInventory implements Serializable {
 								}
 								have = 0;
 								s.setHave(0);
-								s.setWant(want-waitingSize);
+								s.setWant(want-have);
 							}
 						}
 					}
@@ -372,10 +380,10 @@ public class DVDInventory implements Serializable {
 				//e.printStackTrace();
 				displayInformation("Delivery error.");
 			}finally{
-				displayInformation("Delivery is done.");		
+				//displayInformation("Delivery is done.");		
 			}
 		}
-		
+		displayInformation("Delivery is done.");
 		displayInformation("==>");
 	}
 	//Save inventory 
