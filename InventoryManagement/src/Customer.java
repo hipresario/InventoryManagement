@@ -25,6 +25,7 @@ public class Customer implements Serializable {
 		this.phone = phone;
 		this.address = address;
 	}
+	@Override
 	public String toString(){
 		return "Customer: " + this.first + " " + this.last + "\n"
 				+ "Phone: " + this.phone + "\n"

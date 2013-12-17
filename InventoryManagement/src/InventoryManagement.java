@@ -4,7 +4,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Scanner;
-
+/**
+ * LinkedLit based simple DVD Inventory Management System
+ * Read and Store data into binary format file
+ * @author user
+ *
+ */
 public class InventoryManagement implements Serializable {
 	private static final long serialVersionUID = 10L;
 	static SortedStockList inventory = new SortedStockList();
@@ -23,7 +28,6 @@ public class InventoryManagement implements Serializable {
 		}finally {
 		}
 		
-		
 		String userinput= "";
 		displayInformation("Enter H for Available Commands, Q to Quit...");
 		displayInformation("==>");		
@@ -41,30 +45,38 @@ public class InventoryManagement implements Serializable {
 			choice = input[0];
 		}
 		switch(choice.toLowerCase()){
+		//help menu
 		case "h":
 			 printHelpMenu();
 			break;
+		//display all DVDs in alphabetic ascending order
 		case "l":
 			 displayAll();
 			break;
+		//promt to display specific DVD
 		case "i":
 			 displayByTitle();
 			break;
+		//add DVD record 
 		case "a":
 			addByTitle();	
 			break;
+		//modify DVD record
 		case "m":
 			modifyByTitle();	
 			break;
+		//deliver DVD to customer in waiting list
 		case "d":
 			deliveryDVD();
 			break;
+		//print out purchase order 
 		case "o":
 			writePurchaseOrder();
 			break;
-		//case "r":
-			//writeDVDReturn();
-			//break;
+		//remove DVD record
+		case "r":
+			removeByTitle();
+			break;
 		case "s":
 			sellByTitle();
 			break;
@@ -81,15 +93,15 @@ public class InventoryManagement implements Serializable {
 	//help menu
 	public static void printHelpMenu(){
 		displayInformation("===============Help Menu==============");
-		displayInformation("L => Display all DVDs by title");
-		displayInformation("I => Display information for a specific title");
-		displayInformation("A => Add a new DVD title to the inventory");
-		displayInformation("D => Deliver DVD to people in waiting list");
-		displayInformation("M => Modify want value for a specific title");
-		displayInformation("O => Print out purchase order");
-		//displayInformation("R => Make a return order after purchasing done");
+		displayInformation("L => Display all DVD records");
+		displayInformation("I => Display a DVD record");
+		displayInformation("A => Add a new DVD record");
 		displayInformation("S => Sell a DVD");
-		displayInformation("Q => Save and exit the system");
+		displayInformation("R => Remove a DVD record");
+		displayInformation("M => Modify DVD record");
+		displayInformation("D => Print DVD deliver list");
+		displayInformation("O => Print DVD purchase order");
+		displayInformation("Q => Save to file and exit system");
 		displayInformation("==>");
 	}	
 	//display all DVD in ascending order
@@ -102,7 +114,7 @@ public class InventoryManagement implements Serializable {
 			}
 			for (int i=1;i<=size;i++){
 				StockItem s = (StockItem)inventory.getStock(i);
-				displayInformation( i+": " +s.getTitle() + "\n");
+				displayInformation( i+": " +s.getDVD().getTitle() + "\n");
 			}
 				
 		} catch (ListIndexOutOfBoundsException e) {
@@ -144,7 +156,7 @@ public class InventoryManagement implements Serializable {
 			return null;
 		}
 		for (int skip = 1; skip <= size; skip++){
-			if (((StockItem) inventory.getStock(skip)).getTitle().equalsIgnoreCase(title)){
+			if (((StockItem) inventory.getStock(skip)).getDVD().getTitle().equalsIgnoreCase(title)){
 				return (StockItem) inventory.getStock(skip);
 			} else {
 				}
@@ -152,11 +164,34 @@ public class InventoryManagement implements Serializable {
 		return null;
 	}
 	//add by title
+	//TODO:check already added title
 	public static void addByTitle(){
 		displayInformation("Please enter DVD title: ");
 		Scanner sc = new Scanner(System.in);
 		String title = sc.nextLine();
-		StockItem s = new StockItem(title);
+		displayInformation("Please enter DVD year: ");
+		String year = sc.nextLine();
+		
+		displayInformation("Please enter DVD directors: ");
+		String directors = sc.nextLine();
+		
+		displayInformation("Please enter DVD Genres: ");
+		String genres = sc.nextLine();		
+		
+		displayInformation("Please enter DVD runtime: ");
+		String runtime = sc.nextLine();
+			
+		displayInformation("Please enter DVD IMDB Rating: ");
+		String imdbRating = sc.nextLine();
+		
+		displayInformation("Please enter DVD description: ");
+		String description = sc.nextLine();
+		
+		 
+		DVD dvd = new DVD(title, year,directors,description, genres,imdbRating,runtime);
+		
+		StockItem s = new StockItem(dvd);
+		
 		try {
 			inventory.addStock(s);
 			//update have value
@@ -171,7 +206,7 @@ public class InventoryManagement implements Serializable {
 			displayInformation("==>");
 		}
 	}
-	//modify want number for DVD
+	//modify want/have number for DVD
 	public static void modifyByTitle(){
 		
 		displayInformation("Please enter DVD title: ");
@@ -230,22 +265,21 @@ public class InventoryManagement implements Serializable {
 			try {
 				s = ((StockItem)inventory.getStock(skip));
 				if (s == null ){
-					displayInformation("Inventory purchase order error.");
+					displayInformation("Print inventory purchase order error.");
 					return;
 				}
 				int order = s.getOrderNumber();
 				if (order > 0){
-					displayInformation("Order number for " + s.getTitle() + " : "+ order);
+					displayInformation("Order number for " + s.getDVD().getTitle() + " : "+ order);
 					s.setHave(s.getWant());
 					noOrder = false;
 				} else {
-					
 				}
 				
 			} catch (ListIndexOutOfBoundsException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				displayInformation("Inventory write order error.");
+				displayInformation("Print inventory purchase order error.");
 			}
 		}
 		if (noOrder){
@@ -335,7 +369,7 @@ public class InventoryManagement implements Serializable {
 							if (want >= waitingSize){ //waiting is less than want
 								for (int i=1;i<=waitingSize;i++){
 									//display first
-									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									displayInformation("Delivery "+s.getDVD().getTitle()+" to: "+s.getWaitingList().get(1).toString());
 									s.removeFromWaitingList();
 								}
 								want = want - waitingSize;
@@ -344,7 +378,7 @@ public class InventoryManagement implements Serializable {
 							} else {
 								//waiting is more than want
 								for (int i=1;i<=want;i++){
-									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									displayInformation("Delivery "+s.getDVD().getTitle()+" to: "+s.getWaitingList().get(1).toString());
 									s.removeFromWaitingList();
 								}
 								want = waitingSize - want;
@@ -355,7 +389,7 @@ public class InventoryManagement implements Serializable {
 							//have < want
 							if (have >= waitingSize){ //waiting is less than have
 								for (int i=1;i<=waitingSize;i++){
-									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									displayInformation("Delivery "+s.getDVD().getTitle()+" to: "+s.getWaitingList().get(1).toString());
 									s.removeFromWaitingList();
 								}
 								want = want - waitingSize;
@@ -364,7 +398,7 @@ public class InventoryManagement implements Serializable {
 							} else {
 								//waiting is more than have
 								for (int i=1;i<=have;i++){
-									displayInformation("Delivery "+s.getTitle()+" to: "+s.getWaitingList().get(1).toString());
+									displayInformation("Delivery "+s.getDVD().getTitle()+" to: "+s.getWaitingList().get(1).toString());
 									s.removeFromWaitingList();
 
 								}
@@ -384,6 +418,34 @@ public class InventoryManagement implements Serializable {
 			}
 		}
 		displayInformation("Delivery is done.");
+		displayInformation("==>");
+	}
+	//Remove DVD record
+	//TODO: handle not delivered information
+	public static void removeByTitle(){
+		
+		displayInformation("Please enter DVD title: ");
+		Scanner sc = new Scanner(System.in);
+		String title = sc.nextLine();
+		
+		StockItem s = null;
+		try {
+			s = findStockItemByTitle(title);
+		} catch (ListIndexOutOfBoundsException e) {
+			//e.printStackTrace();
+			displayInformation("Remove DVD record error.");
+		}
+		if (s == null){
+			displayInformation("No result found.");
+		} else {
+			try {
+				inventory.removeStock(s);
+			} catch (ListIndexOutOfBoundsException e) {
+				//e.printStackTrace();
+				displayInformation("Remove DVD record error.");
+			}
+			displayInformation("Remove successfully done.");
+		}
 		displayInformation("==>");
 	}
 	//Save inventory 

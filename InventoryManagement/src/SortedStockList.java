@@ -72,7 +72,7 @@ public class SortedStockList implements ListInterface, Serializable{
 		}
 		for (int skip = 1; skip <= this.numItems; skip++){
 			//if current stock title > s.title stop
-			if (((StockItem)curr.getItem()).compareTo(s) >= 0){
+			if (((StockItem)curr.getItem()).getDVD().compareTo(s.getDVD()) >= 0){
 				index = skip;
 				break;
 			} else {

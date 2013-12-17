@@ -11,8 +11,8 @@ public class ListIndexOutOfBoundsException extends Exception {
 	public ListIndexOutOfBoundsException(){
 		
 	}
-	public ListIndexOutOfBoundsException (String description){
-		System.out.print(description);
+	public ListIndexOutOfBoundsException (String msg){
+		System.out.print(msg);
 	}
 	
 }

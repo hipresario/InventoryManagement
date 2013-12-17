@@ -1,46 +1,47 @@
-import java.lang.Comparable;
 import java.io.Serializable;
 /**
  * @author user
  *
  */
-public class StockItem implements Comparable<Object>,Serializable{
+public class StockItem implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String title;
-	private int have, want;
+	private DVD dvd;
+	private int have;
+	private int want;
 	private ListReferenceBased waitingList;
 	
-	public StockItem(String title){
-		this.title = title;
+	public StockItem(){
+		this.dvd = new DVD();
 		this.have = 0;
 		this.want = 0;
 		this.waitingList = new ListReferenceBased();
 	}
 	
-	public StockItem(String title, int have, int want){
-		this.title = title;
-		this.have = have;
-		this.want = want;
+	public StockItem(DVD dvd){
+		this.dvd = dvd;
+		this.have = 0;
+		this.want = 0;
 		this.waitingList = new ListReferenceBased();
 	}
 	
-	public StockItem(String title, int have, int want, ListReferenceBased waitingList){
-		this.title = title;
+	
+	public StockItem(DVD dvd, int have, int want, ListReferenceBased waitingList){
+		this.dvd = dvd;
 		this.have = have;
 		this.want = want;
 		this.waitingList = waitingList;
 	}
 	
 	
-	public String getTitle() {
-		return title;
+	public DVD getDVD() {
+		return dvd;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setDVD(DVD dvd) {
+		this.dvd = dvd;
 	}
 
 	public int getHave() {
@@ -77,37 +78,36 @@ public class StockItem implements Comparable<Object>,Serializable{
 		//remove the first customer on waiting list
 		this.waitingList.remove(1);
 	}
-	//purchase order
+	//purchase order number
 	public int getOrderNumber (){
 		int order = (this.want - this.have);
 		return (order > 0) ? order : 0;
 	}
+	
+	@Override
 	public String toString() {
+		
 		int size = this.waitingList.size();
 		
-		String wl = "Title : " + this.title + "\n";
+		String wl = this.dvd.toString();
 			   wl += "Want: " + this.want + "\n";
 			   wl += "Have: " + this.have + "\n";
 			   wl += "Waiting List: \n";
 		if (size == 0){
-			wl += "0";
-		}
-		for (int i= 1 ;i<= size;i++){
-			try {
-				wl += ((Customer)this.waitingList.get(i)).toString();
-				wl += "\n";
-			} catch (ListIndexOutOfBoundsException e) {
-				 e.printStackTrace();
+			wl += "empty.";
+		}else {
+			for (int i= 1 ;i<= size;i++){
+					wl += i+ " ";
+				try {
+					wl += ((Customer)this.waitingList.get(i)).toString();
+					wl += "\n";
+				} catch (ListIndexOutOfBoundsException e) {
+					 //e.printStackTrace();
+					wl +="waiting list error.\n";
+				}
 			}
 		}
 		
 		return wl;
-		
-	}
-	
-	public int compareTo(Object o) {
- 		
-		return title.compareTo(((StockItem) o).title);
-	}
-	
+	}	
 }
