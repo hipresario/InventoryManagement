@@ -1,15 +1,11 @@
-DVD Inventory Management
-@ author hipresario
-@ date 12/11/2013
-@ version 1.0
-=============================================
-Linked list based DVD Inventory  Management System
-=============================================
-Implementation of Reference Based Linked List in Java
-Including Sorted List
-A Simple DVD Inventory Management System
-1.Track number of DVDs in inventory
-2. Write purchase orders needed
-3. Deliver DVD to people in waiting list
-4. View and Modify DVD information
-5. Read and Store inventory as binary file
+Simple DVD Inventory Management
+Implementation of Reference Based LinkedList in Java(SortedList)
+@ author hipresario date 12/11/2013 version 1.0
+=====================================================
+Functions:
+1. Display all DVD records in inventory
+2. Display specific DVD record
+3. View and Modify DVD record information
+4. Print DVD purchase order
+5. Print DVD delivery list
+6. Read and Store as binary file
