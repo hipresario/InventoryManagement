@@ -9,3 +9,4 @@ Functions:
 4. Print DVD purchase order
 5. Print DVD delivery list
 6. Read and Store as binary file
+7. Load IMDB top 1000 movies from CSV file
