@@ -1,9 +1,14 @@
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Scanner;
+
+import au.com.bytecode.opencsv.CSVReader;
 /**
  * LinkedLit based simple DVD Inventory Management System
  * Read and Store data into binary format file
@@ -12,21 +17,14 @@ import java.util.Scanner;
  */
 public class InventoryManagement implements Serializable {
 	private static final long serialVersionUID = 10L;
+	
+	private static final String fileName = "Movies.csv";
+	private static final String binaryName = "inventory.dat";
 	static SortedStockList inventory = new SortedStockList();
 	
 	public static void main(String [] arg){
+	
 		displayInformation("Welcome to DVD Inventory Management System!");
-		//loading for inventory.dat file first
-		try{
-			FileInputStream fis = new FileInputStream("inventory.dat");
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			Object o = ois.readObject();
-			inventory = (SortedStockList)o;
-			
-		}catch (Exception e){
-			displayInformation("Reading inventory file error.");
-		}finally {
-		}
 		
 		String userinput= "";
 		displayInformation("Enter H for Available Commands, Q to Quit...");
@@ -48,6 +46,12 @@ public class InventoryManagement implements Serializable {
 		//help menu
 		case "h":
 			 printHelpMenu();
+			break;
+		case "b":
+			loadBinaryData(binaryName);
+			break;
+		case "t":
+			loadCSVData(fileName);
 			break;
 		//display all DVDs in alphabetic ascending order
 		case "l":
@@ -93,6 +97,8 @@ public class InventoryManagement implements Serializable {
 	//help menu
 	public static void printHelpMenu(){
 		displayInformation("===============Help Menu==============");
+		displayInformation("B => Load from binary file");
+		displayInformation("T => Load IMDB top 1000 movies");
 		displayInformation("L => Display all DVD records");
 		displayInformation("I => Display a DVD record");
 		displayInformation("A => Add a new DVD record");
@@ -104,6 +110,56 @@ public class InventoryManagement implements Serializable {
 		displayInformation("Q => Save to file and exit system");
 		displayInformation("==>");
 	}	
+	
+	//Simple load binary file 
+	private static void loadBinaryData(String binaryName){
+		//loading for inventory.dat file first
+				try{
+					FileInputStream fis = new FileInputStream(binaryName);
+					ObjectInputStream ois = new ObjectInputStream(fis);
+					Object o = ois.readObject();
+					inventory = (SortedStockList)o;
+					
+				}catch (Exception e){
+					displayInformation("Reading inventory file error.");
+				}finally {
+				}
+				
+	}
+	//Simple load csv file
+	private static void loadCSVData(String fileName){
+		CSVReader reader;
+		try {
+			reader = new CSVReader(new FileReader(fileName));
+			 int i=0;
+			 String [] nextLine;
+			 while ( (nextLine = reader.readNext()) != null) {
+			        // nextLine[] is an array of values from the line
+			    	//skip first row
+				 	if (i == 0 ){
+				 	}else {
+				 		//4:des 5:title 7:directors 9:rate 10:runtime 11: year 12: genre
+				 		//System.out.println(nextLine[0] + nextLine[1] + "etc...");
+				 		addIMDBRecords(nextLine[5], nextLine[11],nextLine[7], nextLine[12],nextLine[10],nextLine[9], nextLine[4]);
+				 	}
+				 	i++;
+			    }
+			    
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+			displayInformation(fileName+ " not found.");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			displayInformation(fileName+ " loading I/O error.");
+			
+		}
+
+		displayInformation("Done!");
+	}
+	
 	//display all DVD in ascending order
 	public static void displayAll(){
 		try {
@@ -163,6 +219,31 @@ public class InventoryManagement implements Serializable {
 			}
 		return null;
 	}
+	
+	
+	
+	public static void addIMDBRecords(String title, String year, String directors, String genres, String runtime, String imdbRating, String description){
+		
+		DVD dvd = new DVD(title, year,directors,description, genres,imdbRating,runtime);
+		
+		StockItem s = new StockItem(dvd);
+		
+		try {
+			inventory.addStockByRating(s);
+			//update have value
+			s.setHave(s.getHave()+1);
+			//displayInformation(title + " is successfully added to inventory.");
+		} catch (ListIndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			displayInformation("Adding " + title + " to inventory has error.");
+		}
+		finally {
+			//displayInformation("==>");
+		}
+	}
+	
+	
 	//add by title
 	//TODO:check already added title
 	public static void addByTitle(){

@@ -117,7 +117,7 @@ public class DVD implements Comparable<DVD>,Serializable {
 		return this.title +" ("+ this.year +")\n"
 				+ this.runtime + " min - " + this.genres + " Ratings: "+this.imdbRating+"/10\n"
 				+ "Director: " + this.directors +"\n"
-				+ this.description +"\n";
+				+ "Description: "+ this.description +"\n";
 		
 		
 	}

@@ -55,6 +55,52 @@ public class SortedStockList implements ListInterface, Serializable{
 		}
 		
 	}
+	
+	public void addStockByRating(Object item)throws ListIndexOutOfBoundsException {
+		
+		//add need to find stock title position by alphabetic order
+		int pos = this.findStockByRating((StockItem)item);
+		if (pos == 1){
+				Node newNode = new Node(item, head);
+				head = newNode;
+				numItems ++;
+		} else if ( pos > 1) {
+				Node prev = findStockByIndex(pos-1);
+				Node newNode = new Node (item, prev.getNext());
+				prev.setNext(newNode);
+				numItems ++;
+		} else {
+			throw new ListIndexOutOfBoundsException("Add stock list out of bonds index.");
+		}
+		
+		
+	}
+	//IMDB rating high to low 
+	private int findStockByRating (StockItem s){
+		Node curr = head;
+		int index = 1;
+		if (numItems == 0){
+			return index;
+		}
+		for (int skip = 1; skip <= this.numItems; skip++){
+			//if current stock title > s.title stop
+			if (Float.parseFloat((((StockItem)curr.getItem()).getDVD().getImdbRating()))<= Float.parseFloat(s.getDVD().getImdbRating())){
+				index = skip;
+				break;
+			} else {
+				//get next stock to compare
+				if (curr.getNext()!= null){
+					curr = curr.getNext();
+				} else {
+					//last stock
+					index = skip+1;	
+				}
+			}
+		}
+		return index;
+	} 
+	
+	
 	//find stock by index number
 	private Node findStockByIndex (int index){
 		Node curr = head;
