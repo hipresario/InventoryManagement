@@ -10,4 +10,4 @@ Functions:
 5. Print DVD delivery list
 6. Read and Store as binary file
 7. Load IMDB top 1000 movies from CSV file
-8. IMDB HTML web page data retrival using jsoup API for movie description (need to verify)
+8. IMDB HTML web page data retrival using jsoup API for movie description (Done!)

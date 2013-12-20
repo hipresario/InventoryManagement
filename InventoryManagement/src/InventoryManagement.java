@@ -33,7 +33,7 @@ public class InventoryManagement implements Serializable {
 	public static void main(String [] arg){
 		
 		 
-		loadIMDBUrl();
+		//loadIMDBUrl();
 	
 		displayInformation("Welcome to DVD Inventory Management System!");
 		
@@ -50,7 +50,6 @@ public class InventoryManagement implements Serializable {
 	}
 	
 	//TODO: to get item_description from IMDB website and write to CSV file
-	
 	private static void doTask(String... input){
 		String choice = "";
 		if (input.length >= 1){
@@ -124,57 +123,26 @@ public class InventoryManagement implements Serializable {
 		displayInformation("Q => Save to file and exit system");
 		displayInformation("==>");
 	}	
-	//IMDB pages control
+	//IMDB pages control, need time wait to process page by page, otherwise timeout error
 	private static void loadIMDBUrl(){
 		int [] loop = {0,101,201,301,401,501,601,701,801,901};
 		int len = loop.length;
-		for (int l = 0; l<len; l++){
-			loadIMDBDescription(l);
-		}
-	}
-	//Load description from imdb html page
-	private static void loadIMDBDescription(int page){
 		String url = "http://www.imdb.com/list/tNwWwtkvwDQ/";
 		String post = "&view=detail&sort=listorian:asc";
 		
-		if (page == 0 ){
-		}else {
-			url = url + "?start="+page+post;
-		}
-		
-		Document doc;
-		try {
-			//amazing referrer to clear 403 error
-			doc = Jsoup.connect(url)
-					.userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-				    .referrer("http://www.google.com").get();
-			
-			//String title = doc.title();
-			//get class name item_description from 1 to last
-			Elements eles = doc.getElementsByClass("item_description");
-			//write into CSV file 
-			//TODO: find a good CSV parser
-			//temp wite to another file and copy to Movies.csv
-			 Iterator<Element> iter = eles.iterator();
-			 String csv = "description-"+page+".csv";
-			 CSVWriter writer = new CSVWriter(new FileWriter(csv));
-			 while (iter.hasNext()){
-				  String[] des = {iter.next().text().toString()};
-				 writer.writeNext(des);
-				// System.out.println(iter.next().text().toString().s);
-			 }
-			 writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			displayInformation("Load HTML document error.");
-			
-		}
-		
-		
+		url = "http://www.imdb.com/list/tNwWwtkvwDQ/?start=901";
+			//		for (int l = 0; l<len; l++){
+//			if (l == 0 ){
+//				 //do nothing
+//			}else {
+//				url = url + "?start="+loop[l]+post;
+//			}
+			//loadIMDBDescription(l);
+			IMDBHarvesting imdb = new IMDBHarvesting(url,"description-901.csv");
+			imdb.startScrapping();
+		//}
 	}
-	
-	//Simple load binary file 
+ 	//Simple load binary file 
 	private static void loadBinaryData(String binaryName){
 		//loading for inventory.dat file first
 				try{
