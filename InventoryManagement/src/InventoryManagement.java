@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Scanner;
 
@@ -32,8 +35,6 @@ public class InventoryManagement implements Serializable {
 	
 	public static void main(String [] arg){
 		
-		 
-		//loadIMDBUrl();
 	
 		displayInformation("Welcome to DVD Inventory Management System!");
 		
@@ -97,6 +98,9 @@ public class InventoryManagement implements Serializable {
 		case "s":
 			sellByTitle();
 			break;
+		case "p":
+			storeToDB();
+			break;
 		case "q":
 			    //save data
 				saveInventory();
@@ -109,22 +113,72 @@ public class InventoryManagement implements Serializable {
 	}
 	//help menu
 	public static void printHelpMenu(){
-		displayInformation("===============Help Menu==============");
-		displayInformation("B => Load from binary file");
-		displayInformation("T => Load IMDB top 1000 movies");
-		displayInformation("L => Display all DVD records");
-		displayInformation("I => Display a DVD record");
-		displayInformation("A => Add a new DVD record");
-		displayInformation("S => Sell a DVD");
-		displayInformation("R => Remove a DVD record");
-		displayInformation("M => Modify DVD record");
-		displayInformation("D => Print DVD deliver list");
-		displayInformation("O => Print DVD purchase order");
-		displayInformation("Q => Save to file and exit system");
-		displayInformation("==>");
+		
+		String menu = "===============Help Menu==============\n"
+					+ "B => Load from binary file\n"
+					+ "T => Load IMDB top 1000 movies\n"
+					+ "L => Display all DVD records\n"
+					+ "I => Display a DVD record\n"
+					+ "A => Add a new DVD record\n"
+					+ "S => Sell a DVD\n"
+					+ "R => Remove a DVD record\n"
+					+ "M => Modify DVD record\n"
+					+ "D => Print DVD deliver list\n"
+					+ "O => Print DVD purchase order\n"
+					+ "P => Store to DB\n"
+					+ "Q => Save to file and exit system\n"
+					+ "==>";
+		
+		displayInformation(menu);
 	}	
+	
+	private static void readMovieRecord(){
+		
+	}
+	
+	private static void storeToDB(){
+		CSVReader reader;
+		try {
+			reader = new CSVReader(new FileReader(fileName));
+			 int i=0;
+			 String [] nextLine;
+			 MySQLConnection myconn = new MySQLConnection();
+			 Connection conn = myconn.getConnection();
+			 while ( (nextLine = reader.readNext()) != null) {
+			        // nextLine[] is an array of values from the line
+			    	//skip first row
+				 	if (i == 0 ){
+				 	}else {
+				 		//4:des 5:title 7:directors 9:rate 10:runtime 11: year 12: genre
+				 		//System.out.println(nextLine[0] + nextLine[1] + "etc...");
+				 		try {
+							writeRecordToDB(conn, i, nextLine[5], nextLine[11], nextLine[7], nextLine[12],nextLine[10],nextLine[9], nextLine[4], "n.a");
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				 	}
+				 	i++;
+			    }
+			    
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+			displayInformation(fileName+ " not found.");
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			displayInformation(fileName+ " loading I/O error.");
+			
+		}
+
+		displayInformation("Store to DB Done!");
+
+	}
 	//IMDB pages control, need time wait to process page by page, otherwise timeout error
 	private static void loadIMDBUrl(){
+		
 		int [] loop = {0,101,201,301,401,501,601,701,801,901};
 		int len = loop.length;
 		String url = "http://www.imdb.com/list/tNwWwtkvwDQ/";
@@ -273,6 +327,47 @@ public class InventoryManagement implements Serializable {
 			//displayInformation("==>");
 		}
 	}
+	
+	public static void writeRecordToDB(Connection conn, int movieid, String title, String year, String directors, String genres, String runtime, String rating, String des, String url) throws SQLException{
+		
+		PreparedStatement prestm = null;
+		if (conn == null){
+			System.out.println("No Database Connection.");
+			return;
+		}
+			try {
+				conn.setAutoCommit(false);
+				String sql = "INSERT INTO MOVIE (movieid, title, year, rating, runtime, directors, description, genres, url) VALUES" + "(?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE movieid = movieid";
+				//ON DUPLICATE KEY UPDATE => check duplicate record for index primary key or unique key if exist update, otherwise insert
+				//or use REPLACE INTO  not suggested since delete is done before insert
+				//String sql = "REPLACE INTO MOVIE (movieid, title, year, rating, runtime, directors, description, genres, url) VALUES" + "(?,?,?,?,?,?,?,?,?)";
+				prestm = conn.prepareStatement(sql);
+				prestm.setInt(1, movieid);
+				prestm.setString(2, title);
+				prestm.setString(3, year);
+				prestm.setString(4, rating);
+				prestm.setString(5, runtime);
+				prestm.setString(6, directors);
+				prestm.setString(7, des);
+				prestm.setString(8, genres);
+				prestm.setString(9, url);
+				
+				prestm.executeUpdate();
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+				SQLExceptionHandler.handleSQLException(e);
+				
+			}finally {
+		        if (prestm != null) {
+		        	prestm.close();
+		        }
+		        conn.setAutoCommit(true);
+		    }
+		
+	}
+	
 	
 	
 	//add by title

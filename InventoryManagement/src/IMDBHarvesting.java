@@ -9,6 +9,10 @@ import org.jsoup.select.Elements;
 
 import au.com.bytecode.opencsv.CSVWriter;
 
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
+
 
 public class IMDBHarvesting {
 	private String url;
@@ -76,6 +80,4 @@ public class IMDBHarvesting {
 			
 			return result;
 		}
-		
-
 }
